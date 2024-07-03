@@ -10,7 +10,6 @@ function App() {
     <div>
       <BrowserRouter>
         <NavBar />
-
         <Routes>
           <Route
             path="/"
@@ -19,6 +18,7 @@ function App() {
 
             }
           />
+
 
           <Route path="/watchlist" element={<Watchlist />} />
         </Routes>

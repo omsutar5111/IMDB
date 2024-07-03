@@ -12,7 +12,6 @@ function Banner() {
                 </div>
             </section> */}
 
-
             <div className='w-full h-[20vh] md:h-[60vh] bg-cover bg-center bg-no-repeat flex items-end'
                 style={{
                     backgroundImage: `url(${img})`
