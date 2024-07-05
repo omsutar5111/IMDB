@@ -1,9 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick/lib/slider';
 import "slick-carousel/slick/slick-theme.css";
 import "slick-carousel/slick/slick.css";
+import MovieDetail from './MovieComponents/MovieDetail';
+import Pagination from './Pagination';
 
 function NextArrow(props) {
     const { onClick } = props;
@@ -24,10 +27,23 @@ function PrevArrow(props) {
 }
 function Movies() {
     const [movies, setMovies] = useState([]);
-    const [pageNo, setPage] = useState(1);
+    const [pageNum, setPageNum] = useState(1);
+    const [selectedMovie, setSelectedMovie] = useState(null);
+    const navigate = useNavigate();
+
+    // Pagination handlers
+    const onNext = () => {
+        setPageNum(pageNum + 1);
+    };
+
+    const onPrev = () => {
+        if (pageNum > 1) {
+            setPageNum(pageNum - 1);
+        }
+    };
     useEffect(() => {
         (function () {
-            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=dceccee14cfac7adec5500d51e72c3e8&language=en-US&page=1&sort_by=popularity.desc&page=${pageNo}`)
+            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=dceccee14cfac7adec5500d51e72c3e8&language=en-US&sort_by=popularity.desc&page=${pageNum}`)
                 .then((res) => {
                     console.log(res.data);
                     setMovies(res.data.results);
@@ -39,17 +55,23 @@ function Movies() {
 
         })();
 
-    }, [pageNo]);
+    }, [pageNum]);
 
-    const fetchMovieDetails = (id) => {
-        axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=dceccee14cfac7adec5500d51e72c3e8&language=en-US`)
-            .then((res) => {
-                console.log("Movie details:", res.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching movie details:", error);
-            });
+    const handleMovieClick = (id) => {
+        navigate(`/movie/${id}`);
     };
+
+
+    // const fetchMovieDetails = (id) => {
+    //     axios.get(`https://api.themoviedb.org/3/movie/${id}?api_key=dceccee14cfac7adec5500d51e72c3e8&language=en-US`)
+    //         .then((res) => {
+    //             console.log("Movie details:", res.data);
+    //             setSelectedMovie(res.data);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching movie details:", error);
+    //         });
+    // };
 
     const settings = {
         dots: false,
@@ -98,7 +120,7 @@ function Movies() {
                             <div
                                 className='w-[200px] h-[35vh] bg-center bg-cover rounded-xl m-4 md:h-[40vh] md:w-[200px] hover:scale-110 duration-300 relative flex items-center cursor-pointer'
                                 style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original/${movie.backdrop_path})` }}
-                                onClick={() => fetchMovieDetails(movie.id)}>
+                                onClick={() => handleMovieClick(movie.id)}>
                                 <div className="text-white font-bold text-center w-full bg-gray-900 bg-opacity-60">
                                     {movie.title}
                                 </div>
@@ -108,12 +130,12 @@ function Movies() {
                 </Slider>
 
             </div>
-
-            <div className='flex  items-center justify-center'>
-                <button className='  bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>Previous</button>
-                <button className='  px-2 items-center m-4'>1</button>
-                <button className=' bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>Next</button>
-            </div>
+            <Pagination
+                pageNumProp={pageNum}
+                onNextProp={onNext}
+                onPrevProp={onPrev}
+            ></Pagination>
+            {selectedMovie && <MovieDetail movie={selectedMovie} />}
         </div>
 
     )
